@@ -31,6 +31,29 @@
     {% block edit_expense %}
     {% endblock %}
 
+    <table style="display:block;">
+        <thead>
+            <tr>
+                {% for column in context["current_budget"].__dict__.keys() %}
+                {% if column != "budget_month" %}
+                <th>{{ column }}</th>
+                {% endif %}
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+    </table>
+        <tr>
+            {% for key, value in context["current_budget"].__dict__.items() %}
+            {% if key != "budget_month" %}
+            <td>{{ value }}</td>
+            {% endif %}
+            {% endfor %}
+        </tr>
+
+
     <table>
         <thead style="display: block">
         <tr>
