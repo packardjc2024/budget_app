@@ -34,6 +34,7 @@
     <table style="display:block;">
         <thead>
             <tr>
+                <th>Totals</th>
                 {% for column in context["current_budget"].__dict__.keys() %}
                 {% if column != "budget_month" %}
                 <th>{{ column }}</th>
@@ -46,6 +47,7 @@
         </tbody>
     </table>
         <tr>
+            <td>Budget</td>
             {% for key, value in context["current_budget"].__dict__.items() %}
             {% if key != "budget_month" %}
             <td>{{ value }}</td>

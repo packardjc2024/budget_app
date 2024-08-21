@@ -20,8 +20,8 @@ class Database:
             database=self.db_name
         )
 
-    def query(self, sql_statement):
-        cursor = self.connection.cursor()
+    def query(self, sql_statement, dictionary=False):
+        cursor = self.connection.cursor(dictionary=dictionary)
         cursor.execute(sql_statement)
         result = cursor.fetchall()
         self.connection.commit()
@@ -49,6 +49,9 @@ class Database:
         SET {", ".join(updates)} 
         WHERE {self.primary_key} LIKE '{object.__dict__[self.primary_key]}';"""
         self.query(update_statement)
+
+    def delete(self, object):
+        self.query(f"DELETE FROM {self.table} WHERE {self.primary_key} LIKE '{object.__dict__[self.primary_key]}';")
 
 
 if __name__ == "__main__":
