@@ -16,6 +16,9 @@ class Budget:
         self.child_care = child_care
         self.insurance = insurance
 
+    def calc_total(self):
+        budgets = [value for key, value in self.__dict__.items() if key != "budget_month"]
+        return sum(budgets)
 
 class BudgetModel(Database):
     """Can also add with self.add(object) and update with self.update(object)"""
@@ -33,10 +36,11 @@ class BudgetModel(Database):
     def get_budget(self, budget_month):
         results = self.get_row(key_value=budget_month)
         return Budget(*results)
+
     
 
 if __name__ == "__main__":
     budget = BudgetModel()
-    budget.create_table()
+    # budget.create_table()
 
     

@@ -41,8 +41,7 @@ class Database:
     def add(self, object):
         columns = ", ".join([key for key in object.__dict__.keys()])
         values = "', '".join([str(value) for value in object.__dict__.values()])
-        # self.query(f"INSERT INTO {self.table} ({columns}) VALUES('{values}');")
-        print(f"INSERT INTO {self.table} ({columns}) VALUES('{values}');")
+        self.query(f"INSERT INTO {self.table} ({columns}) VALUES('{values}');")
 
     def update(self, object):
         updates = [f"{key} = {value}" for key, value in object.__dict__.items() if key != self.primary_key]

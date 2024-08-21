@@ -57,8 +57,17 @@ class ExpenseModel(Database):
         results = self.get_row(key_value=expense_id)
         return Expense(*results)
     
+    def get_all(self, budget_month):
+        results = self.query(f"SELECT * FROM {self.table} WHERE budget_month LIKE '{budget_month}';")
+        return [Expense(*result) for result in results]
+    
+    def get_enums(self, field):
+        return self.__dict__[field]
+    
+    
 
 if __name__ == "__main__":
     test = ExpenseModel()
-    # test.create_table()
+    test.create_table()
+
 

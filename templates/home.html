@@ -49,7 +49,7 @@
             {% endif %}
         <tr class="{{ i }}">
             {% for column in context["columns"] %}
-            <td>{{ expense[column["name"]] }}</td>
+            <td>{{ expense[column] }}</td>
             {% endfor %}
             <!-- <td><form action="/delete" method="POST"><button name="expense_id" type="Submit" value="{{ expense['expense_id'] }}">Delete</button></form></td>
             <td><form action="/edit" method="POST"><button name="expense_id" type="Submit" value="{{ expense['expense_id'] }}">Edit</button></form></td> -->
