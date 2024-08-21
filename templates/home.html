@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expenses</title>
+    <style>
+        .grey{
+            background-color: lightgrey;
+            border-collapse: collapse;
+        }
+        td, th {
+            padding: 5px;
+        }
+
+    </style>
+
+</head>
+<body>
+    <div class="nav_bar">
+        <a href="{{ url_for('home') }}">Home</a>
+    </div>
+
+
+    <h1>Current Expenses for {{ context["current_budget_month"] }}</h1>
+
+    {% block add_expense %}
+    {% endblock %}
+
+    {% block change_month %}
+    {% endblock %}
+
+    {% block edit_expense %}
+    {% endblock %}
+
+    <table>
+        <thead style="display: block">
+        <tr>
+            {% for column in context["column_display_names"] %}
+            <th>{{ column }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+
+        <tbody style="display:block; overflow-y:auto; height:400px; width:100%;">
+        {% for expense in context["expenses"] %}
+            {% if expense['expense_id'] % 2 == 0 %}
+            {% set i = "white" %}
+            {% else %}
+            {% set i = "grey" %}
+            {% endif %}
+        <tr class="{{ i }}">
+            {% for column in context["columns"] %}
+            <td>{{ expense[column["name"]] }}</td>
+            {% endfor %}
+            <!-- <td><form action="/delete" method="POST"><button name="expense_id" type="Submit" value="{{ expense['expense_id'] }}">Delete</button></form></td>
+            <td><form action="/edit" method="POST"><button name="expense_id" type="Submit" value="{{ expense['expense_id'] }}">Edit</button></form></td> -->
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

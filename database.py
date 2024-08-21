@@ -10,6 +10,8 @@ class Database:
         self.user = user
         self.password = password
         self.host = host
+        self.table = None
+        self.primary_key = None
 
         self.connection = mysql.connector.connect(
             host=self.host,
@@ -25,3 +27,30 @@ class Database:
         self.connection.commit()
         cursor.close()
         return result
+
+    def get_columns(self):
+        return [res[0] for res in self.query(f"DESC {self.table};")]
+    
+    def get_display_columns(self):
+        columns = self.get_columns()
+        return [column.replace("_", " ").title() for column in columns]
+    
+    def get_row(self, key_value):
+        return self.query(f"select * from {self.table} where {self.primary_key} like '{key_value}';")[0]
+    
+    def add(self, object):
+        columns = ", ".join([key for key in object.__dict__.keys()])
+        values = "', '".join([str(value) for value in object.__dict__.values()])
+        # self.query(f"INSERT INTO {self.table} ({columns}) VALUES('{values}');")
+        print(f"INSERT INTO {self.table} ({columns}) VALUES('{values}');")
+
+    def update(self, object):
+        updates = [f"{key} = {value}" for key, value in object.__dict__.items() if key != self.primary_key]
+        update_statement =  f"""UPDATE {self.table}
+        SET {", ".join(updates)} 
+        WHERE {self.primary_key} LIKE '{object.__dict__[self.primary_key]}';"""
+        self.query(update_statement)
+
+
+if __name__ == "__main__":
+    pass
