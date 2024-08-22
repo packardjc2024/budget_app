@@ -2,6 +2,7 @@
     background-color: lightgrey;
     border-collapse: collapse;
 }
+
 td, th {
     padding: 5px;
 }
@@ -9,9 +10,12 @@ td, th {
 table {
     display: block;
     border: 2px solid black;
-    width: 100%;
 }
 
 tr {
+    border: 1px solid black;
+}
+
+.edit{
     border: 1px solid black;
 }

@@ -14,8 +14,9 @@ def context(budget_month):
     budget_summary = current_budget.calc_budget()
     budget_summary["months"] = months
     budget_summary["current"] = budget_month
+    budget_summary["line_items"] = ExpenseModel().line_items
+    budget_summary["payment_methods"] = ExpenseModel().payment_methods
     return budget_summary
-
 
 
 app = Flask(__name__)
@@ -28,25 +29,52 @@ def home():
     budget month. It then retrieves and displays the budget summary and the
     expenses for the budget.
     """
-    # current_date = datetime.now()
-    # current_budget_month = current_date.strftime("%-m/%Y")
-    # months = [f"{i}/{current_date.year}" for i in range(1, 13)]
-    # budget_model = BudgetModel()
-    # expense_model = ExpenseModel()
-
     if request.method == "GET":
-        # current_budget = budget_model.select_budget(current_budget_month)
-        # budget_summary = current_budget.calc_budget()
-        # budget_summary["months"] = months
         return render_template("index.html", context=context(current_budget_month))
     
     elif request.method == "POST":
         new_month = request.form.get("chosen_month")
         return render_template("index.html", context=context(new_month))
+    
+@app.route("/delete", methods=["POST"])
+def delete():
+    """
+    This route deletes an expense from the table and then returns to the home
+    page which will update to include the current database table. 
+    """
+    id = request.form.get("expense_id")
+    expense = ExpenseModel().select_expense(id)
+    ExpenseModel().delete(expense)
+    return render_template("index.html", context=context(expense.budget_month))
 
+@app.route("/edit", methods=["POST"])
+def edit():
+    """
+    This route uses the expense id to retrieve the expense and then
+    render the edit.html form to make the changes. 
+    """
+    id = request.form.get("expense_id")
+    expense = ExpenseModel().select_expense(id)
+    dictionary = context(expense.budget_month)
+    dictionary["expense"] = expense
+    return render_template("edit.html", context=dictionary)
+    
+@app.route("/update", methods = ["POST"])
+def update():
+    """
+    This route takes the changes to the expense entered into the form and 
+    updates the table before rerendering the home page. 
+    """
+    data = request.form
+    expense = Expense(*data.values())
+    ExpenseModel().update(expense)
+    return render_template("index.html", context=context(expense.budget_month))
+        
 
+#### Edit Expense
+#### Add Expense
 ##### make table bodys scrollable
-#### change budget month as the post to home
+#### add option to check emails for expenses to add
 
 
 

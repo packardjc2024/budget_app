@@ -72,7 +72,7 @@ class Database:
         argument. Updates every column except the primary key even if there are no
         changes to save having to add extra arguments and logic.
         """
-        updates = [f"{key} = {value}" for key, value in object.__dict__.items() if key != self.primary_key]
+        updates = [f"{key} = '{value}'" for key, value in object.__dict__.items() if key != self.primary_key]
         update_statement =  f"""UPDATE {self.table}
         SET {", ".join(updates)} 
         WHERE {self.primary_key} LIKE '{object.__dict__[self.primary_key]}';"""

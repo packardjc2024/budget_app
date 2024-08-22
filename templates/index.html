@@ -35,7 +35,7 @@
     <br>
     <br>
 
-    <table>
+    <table class="budget_table">
         <thead>
             <tr>
                 <th>Totals</th>
@@ -61,12 +61,17 @@
         </tbody>
     </table>
         
-    <table>
+    <br>
+    <br>
+
+    <table class="expenses_table">
         <thead>
         <tr>
             {% for key in context["expenses"][0].__dict__.keys() %}
             <th>{{ key.replace("_", " ").title() }}</th>
             {% endfor %}
+            <th>Delete</th>
+            <th>Edit</th>
         </tr>
         </thead>
 
@@ -81,8 +86,8 @@
             {% for column in expense.__dict__.keys() %}
             <td>{{ expense[column] }}</td>
             {% endfor %}
-            <!-- <td><form action="/delete" method="POST"><button name="expense_id" type="Submit" value="{{ expense['expense_id'] }}">Delete</button></form></td>
-            <td><form action="/edit" method="POST"><button name="expense_id" type="Submit" value="{{ expense['expense_id'] }}">Edit</button></form></td> -->
+            <td><form action="/delete" method="POST"><button name="expense_id" type="Submit" value="{{ expense.expense_id }}">Delete</button></form></td>
+            <td><form action="/edit" method="POST"><button name="expense_id" type="Submit" value="{{ expense.expense_id }}">Edit</button></form></td>
         </tr>
         {% endfor %}
         </tbody>
