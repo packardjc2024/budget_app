@@ -53,15 +53,25 @@ class Budget:
         self.insurance = insurance
 
     def __calc_total(self):
+        """
+        Sums all of the budget's line items for the total budget.
+        """
         budgeted = {key: value for key, value in self.__dict__.items() if key != "budget_month"}
         budgeted["total"] = sum([value for value in budgeted.values()])
         return budgeted
 
     def __get_expenses(self):
+        """
+        Retrieves all of the expenses for the current budget's month.
+        """
         model = ExpenseModel()
         return model.select_all(self.budget_month)
 
     def __calc_spent(self, expenses):
+        """
+        Sums the expenses for the given month by line item and then calculates
+        the total spent.
+        """
         spent = {key: 0 for key in self.__dict__.keys() if key != "budget_month"}
         for expense in expenses:
             spent[expense.line_item] += expense.amount
@@ -69,12 +79,20 @@ class Budget:
         return spent
 
     def __calc_remaning(self, budgeted, spent):
+        """
+        For each line item subtracts the amount in the spent dictionary from
+        the budgeted dictionary. 
+        """
         remaining = {}
         for key, value in budgeted.items():
             remaining[key] = value - spent[key]
         return remaining
 
     def calc_budget(self):
+        """
+        Calls all of the 'private' methods in the proper order and then returns
+        a dictionary that summarzes the current state of the budget. 
+        """
         budgeted = self.__calc_total()
         expenses = self.__get_expenses()
         spent = self.__calc_spent(expenses)

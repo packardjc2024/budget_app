@@ -7,6 +7,12 @@ app = Flask(__name__)
 
 @app.route("/", methods=["POST", "GET"])
 def home():
+    """
+    This route serves as the home page for the app. When it first loads it uses
+    datetime to get the current date and uses that month to serve as the default
+    budget month. It then retrieves and displays the budget summary and the
+    expenses for the budget.
+    """
     current_date = datetime.now()
     current_budget_month = current_date.strftime("%-m/%Y")
     budget_model = BudgetModel()
