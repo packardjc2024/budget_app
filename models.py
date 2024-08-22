@@ -1,3 +1,10 @@
+"""
+In my ORMish app this module holds the base classes for the core of the app.
+The models inherit from the database class and use those methods to operate 
+on the Budget and Expense object respectively.
+"""
+
+
 from database import Database
 from datetime import datetime
 
@@ -7,6 +14,10 @@ from datetime import datetime
 ###################################################################################################
 
 class Expense:
+    """
+    The Expense serves as the base class for the ExpenseModel and contains
+    all of the desired information about a single expense. 
+    """
     def __init__(self, expense_id=None, description=None, amount=None,
                  date=None, merchant=None, line_item=None,
                  payment_method=None, budget_month=None):
@@ -21,6 +32,12 @@ class Expense:
 
 
 class Budget:
+    """
+    The Budget serves as the base class for the BudgetModel and contains the
+    budget month as well as each line item's budget. It also contains methods
+    that work with the ExpenseModel to calculate the total, spent, and remaining
+    for each line item.
+    """
     def __init__(self, budget_month=None, gas=None, food=None, mortgage=None,
                  phone=None, electric=None, internet=None, trash=None,
                  child_care=None, insurance=None):
@@ -42,7 +59,7 @@ class Budget:
 
     def __get_expenses(self):
         model = ExpenseModel()
-        return model.get_all(self.budget_month)
+        return model.select_all(self.budget_month)
 
     def __calc_spent(self, expenses):
         spent = {key: 0 for key in self.__dict__.keys() if key != "budget_month"}
@@ -76,26 +93,52 @@ class Budget:
 
 
 class BudgetModel(Database):
-    """Can also add with self.add(object) and update with self.update(object)"""
+    """
+    This model inherits from the Database class. In addition to the methods
+    defined here, it uses the query, add, update, and delete from the parent
+    class.
+    """
     def __init__(self):
+        """
+        Inherits from the parent class and sets the fields for the table
+        as all of the attributes from the Budget class.
+        """
         super().__init__()
         self.table= "budgets"
         self.primary_key = "budget_month"
         self.fields = [key for key in Budget().__dict__.keys()]
 
     def create_table(self):
+        """
+        Creates the budgets table in the database by using the fields and
+        adding the datatypes. 
+        """
         columns = ["budget_month VARCHAR(7)",]
         columns.extend([f"{field} SMALL INT UNSIGNED DEFAULT 0" for field in self.fields if field != "budget_month"])
         self.query(f"INSERT INTO {self.table} ({", ".join(columns)});")
 
-    def get_budget(self, budget_month):
-        results = self.get_row(key_value=budget_month)
+    def select_budget(self, budget_month):
+        """
+        Selects a row from the budgets table and then converts that row into 
+        a Budget object.
+        """
+        results = self.select_row(key_value=budget_month)
         return Budget(*results)
     
 
 class ExpenseModel(Database):
-    """Can also add with self.add(object) and update with self.update(object)"""
+    """
+    This model inherits from the Database class. In addition to the methods
+    defined here, it uses the query, add, update, and delete from the parent
+    class. It also has two more methods that the BudgetModel.
+    """
     def __init__(self):
+        """
+        In additon to inhering from the parent class, the __init__ method
+        sets the payment_methods and line_items lists that will serve as 
+        ENUM values in the table. It also defines the fields for the table
+        as the attributes of the Expense class.
+        """
         super().__init__()
         self.table = "expenses"
         self.primary_key = "expense_id"
@@ -110,6 +153,10 @@ class ExpenseModel(Database):
         self.budget_months = [f"{i}/{datetime.now().year}" for i in range(1, 13)]
 
     def create_table(self):
+        """
+        Creates the expenses table in the database by using the fields and
+        adding the datatypes. 
+        """
         columns = []
         for field in self.fields:
             if field == "expense_id":
@@ -129,24 +176,36 @@ class ExpenseModel(Database):
             columns.append(f"{field} {datatype}")
         self.query(f"INSERT INTO {self.table} ({", ".join(columns)});")
 
-    def get_expense(self, expense_id):
-        results = self.get_row(key_value=expense_id)
+    def select_expense(self, expense_id):
+        """
+        Selects a row from the expenses table and converts it into an Expense
+        object. 
+        """
+        results = self.select_row(key_value=expense_id)
         return Expense(*results)
     
-    def get_all(self, budget_month, dictionary=False):
+    def select_all(self, budget_month, dictionary=False):
+        """
+        This method was created becuase it will be called frequently instead of constantly
+        modifying the select_row or query methods.
+        """
         results = self.query(f"SELECT * FROM {self.table} WHERE budget_month LIKE '{budget_month}';", dictionary=dictionary)
         return [Expense(*result) for result in results]
     
     def get_enums(self, field):
+        """
+        This method gets the ENUM values of the argument column so that they can
+        be used in the HTML select box. 
+        """
         return self.__dict__[field]
 
     
 
 if __name__ == "__main__":
-    # connection = Database(db_name=None)
-    # connection.query("CREATE budget_app;")
-    # budget = BudgetModel()
-    # budget.create_table()
-    # expense = ExpenseModel()
-    # expense.create_table()
-    pass
+    """ Creates the database and tables for the app"""
+    connection = Database(db_name=None)
+    connection.query("CREATE budget_app;")
+    budget = BudgetModel()
+    budget.create_table()
+    expense = ExpenseModel()
+    expense.create_table()

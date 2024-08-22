@@ -13,13 +13,14 @@ def home():
     expense_model = ExpenseModel()
 
     if request.method == "GET":
-        current_budget = budget_model.get_budget(current_budget_month)
+        current_budget = budget_model.select_budget(current_budget_month)
         budget_summary = current_budget.calc_budget()
         return render_template("index.html", context=budget_summary)
 
 
-###### display those calculated totals on home page
-##### clear up table where headers arent lined up with rows
+### continue finishing docs on models and on main
+##### make table bodys scrollable
+#### change budget month as the post to home
 
 
 
