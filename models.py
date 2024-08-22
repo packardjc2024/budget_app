@@ -36,7 +36,7 @@ class Budget:
         self.insurance = insurance
 
     def __calc_total(self):
-        budgeted = {key: value for key, value in self.__dict__.items() if key != "budget_monthg"}
+        budgeted = {key: value for key, value in self.__dict__.items() if key != "budget_month"}
         budgeted["total"] = sum([value for value in budgeted.values()])
         return budgeted
 
@@ -45,9 +45,10 @@ class Budget:
         return model.get_all(self.budget_month)
 
     def __calc_spent(self, expenses):
-        spent = {}
+        spent = {key: 0 for key in self.__dict__.keys() if key != "budget_month"}
         for expense in expenses:
             spent[expense.line_item] += expense.amount
+        spent["total"] = sum([value for value in spent.values()])
         return spent
 
     def __calc_remaning(self, budgeted, spent):
@@ -61,7 +62,8 @@ class Budget:
         expenses = self.__get_expenses()
         spent = self.__calc_spent(expenses)
         remaining = self.__calc_remaning(budgeted, spent)
-        return {"budgeted": budgeted,
+        return {"month": self.budget_month,
+                "budgeted": budgeted,
                 "expenses": expenses,
                 "spent": spent,
                 "remaining": remaining,}

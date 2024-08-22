@@ -2,17 +2,7 @@
 <html>
 <head>
     <title>Expenses</title>
-    <style>
-        .grey{
-            background-color: lightgrey;
-            border-collapse: collapse;
-        }
-        td, th {
-            padding: 5px;
-        }
-
-    </style>
-
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <div class="nav_bar">
@@ -20,7 +10,7 @@
     </div>
 
 
-    <h1>Current Expenses for {{ context["current_budget_month"] }}</h1>
+    <h1>Current Expenses for {{ context["month"] }}</h1>
 
     {% block add_expense %}
     {% endblock %}
@@ -31,49 +21,50 @@
     {% block edit_expense %}
     {% endblock %}
 
-    <table style="display:block;">
+    <table>
         <thead>
             <tr>
                 <th>Totals</th>
-                {% for column in context["current_budget"].__dict__.keys() %}
-                {% if column != "budget_month" %}
-                <th>{{ column }}</th>
-                {% endif %}
+                {% for key in context["budgeted"].keys() %}
+                <th>{{ key.replace("_", " ").title() }}</th>
                 {% endfor %}
             </tr>
         </thead>
         <tbody>
-
-        </tbody>
-    </table>
-        <tr>
-            <td>Budget</td>
-            {% for key, value in context["current_budget"].__dict__.items() %}
-            {% if key != "budget_month" %}
-            <td>{{ value }}</td>
-            {% endif %}
-            {% endfor %}
-        </tr>
-
-
-    <table>
-        <thead style="display: block">
-        <tr>
-            {% for column in context["column_display_names"] %}
-            <th>{{ column }}</th>
-            {% endfor %}
-        </tr>
-        </thead>
-
-        <tbody style="display:block; overflow-y:auto; height:400px; width:100%;">
-        {% for expense in context["expenses"] %}
-            {% if expense['expense_id'] % 2 == 0 %}
+            {% for key in ("budgeted", "spent", "remaining") %}
+            {% if loop.index % 2 == 0 %}
             {% set i = "white" %}
             {% else %}
             {% set i = "grey" %}
             {% endif %}
         <tr class="{{ i }}">
-            {% for column in context["columns"] %}
+            <td>{{ key.replace("_", " ").title()  }}</td>
+            {% for value in context[key].values() %}
+            <td>{{ value }}</td>
+            {% endfor %}
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+        
+    <table>
+        <thead>
+        <tr>
+            {% for key in context["expenses"][0].__dict__.keys() %}
+            <th>{{ key.replace("_", " ").title() }}</th>
+            {% endfor %}
+        </tr>
+        </thead>
+
+        <tbody>
+        {% for expense in context["expenses"] %}
+            {% if loop.index % 2 == 0 %}
+            {% set i = "white" %}
+            {% else %}
+            {% set i = "grey" %}
+            {% endif %}
+        <tr class="{{ i }}">
+            {% for column in expense.__dict__.keys() %}
             <td>{{ expense[column] }}</td>
             {% endfor %}
             <!-- <td><form action="/delete" method="POST"><button name="expense_id" type="Submit" value="{{ expense['expense_id'] }}">Delete</button></form></td>

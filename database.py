@@ -27,14 +27,7 @@ class Database:
         self.connection.commit()
         cursor.close()
         return result
-
-    def get_columns(self):
-        return [res[0] for res in self.query(f"DESC {self.table};")]
-    
-    def get_display_columns(self):
-        columns = self.get_columns()
-        return [column.replace("_", " ").title() for column in columns]
-    
+     
     def get_row(self, key_value):
         return self.query(f"select * from {self.table} where {self.primary_key} like '{key_value}';")[0]
     

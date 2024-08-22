@@ -1,0 +1,11 @@
+.grey{
+    background-color: lightgrey;
+    border-collapse: collapse;
+}
+td, th {
+    padding: 5px;
+}
+
+table {
+    display: block;
+}
