@@ -218,8 +218,6 @@ class ExpenseModel(Database):
         """
         return self.__dict__[field]
 
-    
-
 if __name__ == "__main__":
     """ Creates the database and tables for the app"""
     connection = Database(db_name=None)

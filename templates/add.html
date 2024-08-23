@@ -2,40 +2,35 @@
 {% block add_expense %}
 
 <form action="/add" method="POST">
-    {% for column in columns if column['name'] != "expense_id" %}
-        <label for="{{ column['name'] }}">{{ column['display_name'] }}:</label>
-        {% if column['name'] == "payment_method" %}
-            <select name="{{ column['name'] }}" id="{{ column['name'] }}">
-                {% for method in payment_methods %}
+    <input type="hidden" name="expense_id" value="NULL">
+    {% for column in context["expenses"][0].__dict__.keys() if column != "expense_id" %}
+        <label for="{{ column }}">{{ column.replace("_", " ").title() }}:</label>
+        {% if column == "payment_method" %}
+            <select name="{{ column }}" id="{{ column }}">
+                {% for method in context["payment_methods"] %}
                 <option value="{{ method }}">{{ method }}</option>
                 {% endfor %}
             </select><br>
-        {% elif column['name'] == "line_item" %}
-        <select name="{{ column['name'] }}" id="{{ column['name'] }}">
-            {% for item in line_items %}
-            <option value="{{ item }}">{{ item }}</option>
+        {% elif column == "line_item" %}
+        <select name="{{ column }}" id="{{ column }}">
+            {% for item in context["line_items"] %}
+            <option value="{{ item }}">{{ item.replace("_", " ").title() }}</option>
             {% endfor %}
         </select><br>
-        {% elif column['name'] == "budget_month" %}
-        <select name="{{ column['name'] }}" id="{{ column['name'] }}">
-            {% for month in months %}
+        {% elif column == "budget_month" %}
+        <select name="{{ column }}" id="{{ column }}">
+            {% for month in context["months"] %}
             <option value="{{ month }}">{{ month }}</option>
             {% endfor %}
         </select><br>
-        {% elif column['name'] == "budget_year" %}
-        <select name="{{ column['name'] }}" id="{{ column['name'] }}">
-            {% for year in years %}
-            <option value="{{ year }}">{{ year }}</option>
-            {% endfor %}
-        </select><br>
-        {% elif column['name'] == "amount" %}
-        <input type="number" id="{{ column['name'] }}" name="{{ column['name'] }}"
+        {% elif column == "amount" %}
+        <input type="number" id="{{ column }}" name="{{ column }}"
             max="9999" min="0" step="0.01" required><br>
-        {% elif column['name'] == "date" %}
-        <input type="date" id="{{ column['name'] }}" name="{{ column['name'] }}" 
-            required value="{{ current_date }}"><br>
+        {% elif column == "date" %}
+        <input type="date" id="{{ column }}" name="{{ column }}" 
+            required value="{{ context['current_date'] }}"><br>
         {% else %}  
-            <input type="text" id="{{ column['name'] }}" name="{{ column['name'] }}" required
+            <input type="text" id="{{ column }}" name="{{ column }}" required
                 maxlength="20"><br>
         {% endif %}
     {% endfor %}

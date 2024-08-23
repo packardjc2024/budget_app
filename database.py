@@ -55,15 +55,16 @@ class Database:
         that is not called directly by the child classes, but instead is called
         and then added to.
         """
-        return self.query(f"select * from {self.table} where {self.primary_key} like '{key_value}';")[0]
+        result = self.query(f"select * from {self.table} where {self.primary_key} like '{key_value}';")
+        return result[0]
     
     def add(self, object):
         """
         Adds a row to the table. Takes either a budget or expense object as the
         argument.
         """
-        columns = ", ".join([key for key in object.__dict__.keys()])
-        values = "', '".join([str(value) for value in object.__dict__.values()])
+        columns = ", ".join([key for key in object.__dict__.keys() if key != "expense_id"])
+        values = "', '".join([str(value) for value in object.__dict__.values() if value != "NULL"])
         self.query(f"INSERT INTO {self.table} ({columns}) VALUES('{values}');")
 
     def update(self, object):
