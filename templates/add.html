@@ -3,7 +3,7 @@
 
 <form action="/add" method="POST">
     <input type="hidden" name="expense_id" value="NULL">
-    {% for column in context["expenses"][0].__dict__.keys() if column != "expense_id" %}
+    {% for column in context["expense"].__dict__.keys() if column != "expense_id" %}
         <label for="{{ column }}">{{ column.replace("_", " ").title() }}:</label>
         {% if column == "payment_method" %}
             <select name="{{ column }}" id="{{ column }}">

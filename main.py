@@ -17,16 +17,17 @@ app = Flask(__name__)
 
 
 @app.route("/", methods=["GET"])
+def index():
+    """The inital page for the app. It uses the current date to generate all
+    the tables' data."""
+    return (render_template("index.html", context=create_context(datetime.now().strftime("%-m-%Y"))))
+
 @app.route("/<budget_month>", methods=["GET"])
-def index(budget_month=datetime.now().strftime("%-m-%Y")):
+def home(budget_month):
     """
-    This route serves as the home page for the app. When it first loads it uses
-    datetime to get the current date and uses that month to serve as the default
-    budget month. It then retrieves and displays the budget summary and the
-    expenses for the budget.
+    This route serves as the home page for the app after any changes are made.
+    It takes the budget_month passed from the other views and generates the data.
     """
-    if "budget_month" in request.args:
-        budget_month = request.args.get("budget_month")
     return render_template("index.html", context=create_context(budget_month))
 
 @app.route("/month", methods=["GET", "POST"])
@@ -38,9 +39,7 @@ def month():
     if request.method == "GET":
         return render_template("month.html", context=create_context(datetime.now().strftime("%-m-%Y")))
     elif request.method == "POST":
-        new_month = request.form.get("chosen_month")
-        print(new_month)
-        return redirect(url_for("index", budget_month=new_month))
+        return redirect(url_for("home", budget_month=request.form.get("chosen_month")))
 
     
 @app.route("/delete", methods=["POST"])
@@ -49,10 +48,9 @@ def delete():
     This route deletes an expense from the table and then returns to the home
     page which will update to include the current database table. 
     """
-    id = request.form.get("expense_id")
-    expense = ExpenseModel().select_expense(id)
+    expense = ExpenseModel().select_expense(request.form.get("expense_id"))
     ExpenseModel().delete(expense)
-    return redirect(url_for(".index", budget_month=expense.budget_month))
+    return redirect(url_for("home", budget_month=expense.budget_month))
 
 @app.route("/edit", methods=["POST"])
 def edit():
@@ -60,8 +58,7 @@ def edit():
     This route uses the expense id to retrieve the expense and then
     render the edit.html form to make the changes. 
     """
-    id = request.form.get("expense_id")
-    expense = ExpenseModel().select_expense(id)
+    expense = ExpenseModel().select_expense(request.form.get("expense_id"))
     dictionary = create_context(expense.budget_month)
     dictionary["expense"] = expense
     return render_template("edit.html", context=dictionary)
@@ -75,18 +72,18 @@ def update():
     data = request.form
     expense = Expense(*data.values())
     ExpenseModel().update(expense)
-    return redirect(url_for("index", budget_month=expense.budget_month))
+    return redirect(url_for("home", budget_month=expense.budget_month))
 
 @app.route("/add", methods=["POST"])    
 @app.route("/add/<budget_month>", methods=["GET"])
-def add():
+def add(budget_month=None):
     """
     This route allows the user to add a new expense to the expenses table. 
     """
     if request.method == "GET":
-        budget_month = request.args.get("budget_month")
         context=create_context(budget_month)
         context["current_date"] = datetime.now().strftime("%Y-%m-%d")
+        context["expense"] = Expense()
         return render_template("add.html", context=context)
 
     elif request.method == "POST":
@@ -94,17 +91,19 @@ def add():
         expense = Expense(*data.values())
         print(expense.__dict__)
         ExpenseModel().add(expense)
-        return redirect(url_for("index", budget_month=expense.budget_month))
+        return redirect(url_for("home", budget_month=expense.budget_month))
 
-#### Add Expense
+#### budget month in add defaults to 1/2024
+
 ##### make table bodys scrollable
 #### add option to check emails for expenses to add
 #### clearn up html and css
 #### make budgets editable with main.py and BudgetModel
 #### add ReadMe
-#### add date url when going home ### date resetting to current
-#### how to account if not expenses for month or no budget?????>
+#### how to account if no budget?????>
 ### check submission validity before updating or adding ###
+### testing
+### logging
 
 if __name__ == "__main__":
     app.run()

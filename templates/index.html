@@ -6,7 +6,7 @@
 </head>
 <body>
     <div class="nav_bar">
-        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('home', budget_month=context['current']) }}">Home</a>
         <a href="{{ url_for('month') }}">Change Month</a>
         <a href="{{ url_for('add', budget_month=context['current']) }}">Add Expense</a>
     </div>
@@ -55,6 +55,7 @@
     <br>
     <br>
 
+    {% if context["expenses"] %}
     <table class="expenses_table">
         <thead>
         <tr>
@@ -83,5 +84,8 @@
         {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <h3>No Expenses yet...</h3>
+    {% endif %}
 </body>
 </html>
