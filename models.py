@@ -131,9 +131,10 @@ class BudgetModel(Database):
         Creates the budgets table in the database by using the fields and
         adding the datatypes. 
         """
-        columns = ["budget_month VARCHAR(7)",]
-        columns.extend([f"{field} SMALL INT UNSIGNED DEFAULT 0" for field in self.fields if field != "budget_month"])
-        self.query(f"INSERT INTO {self.table} ({", ".join(columns)});")
+        columns = ["budget_month VARCHAR(7) PRIMARY KEY",]
+        columns.extend([f"{field} SMALLINT UNSIGNED DEFAULT 0" for field in self.fields if field != "budget_month"])
+        self.query(f"CREATE TABLE {self.table} ({", ".join(columns)});")
+        
 
     def select_budget(self, budget_month):
         """
@@ -167,8 +168,8 @@ class ExpenseModel(Database):
             'Cash',
             'Check',
         ]
-        self.line_items = [line_item for line_item in Budget().__dict__.keys()]
-        self.budget_months = [f"{i}/{datetime.now().year}" for i in range(1, 13)]
+        self.line_items = [line_item for line_item in Budget().__dict__.keys() if line_item != "budget_month"]
+        self.budget_months = [f"{i}-{datetime.now().year}" for i in range(1, 13)]
 
     def create_table(self):
         """
@@ -192,7 +193,7 @@ class ExpenseModel(Database):
             elif field == "budget_month":
                 datatype = f"ENUM('{"', '".join(self.budget_months)}')"
             columns.append(f"{field} {datatype}")
-        self.query(f"INSERT INTO {self.table} ({", ".join(columns)});")
+        self.query(f"CREATE TABLE {self.table} ({", ".join(columns)});")
 
     def select_expense(self, expense_id):
         """
@@ -222,8 +223,26 @@ class ExpenseModel(Database):
 if __name__ == "__main__":
     """ Creates the database and tables for the app"""
     connection = Database(db_name=None)
-    connection.query("CREATE budget_app;")
+    connection.query("CREATE DATABASE budget_app;")
     budget = BudgetModel()
     budget.create_table()
     expense = ExpenseModel()
     expense.create_table()
+
+    # Sample Budgets
+    for i in range(1, 13):
+        budget = Budget(f"{i}-2024", 100, 100, 100, 100, 100, 100, 100, 100, 100)
+        BudgetModel().add(budget)
+
+    # Sample Expenses
+    import random
+    for i in range(1, 101):
+        day = random.randint(1, 28)
+        month = random.randint(1, 12)
+        model = ExpenseModel()
+        expense = Expense(i, f"sample {i}", random.randint(1, 50),
+                          f"2024-{month}-{day}", f"merchant {i}",
+                          random.choice(model.line_items),
+                          random.choice(model.payment_methods),
+                          f"{month}-2024")
+        model.add(expense)

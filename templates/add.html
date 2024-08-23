@@ -1,0 +1,46 @@
+{% extends "index.html" %}
+{% block add_expense %}
+
+<form action="/add" method="POST">
+    {% for column in columns if column['name'] != "expense_id" %}
+        <label for="{{ column['name'] }}">{{ column['display_name'] }}:</label>
+        {% if column['name'] == "payment_method" %}
+            <select name="{{ column['name'] }}" id="{{ column['name'] }}">
+                {% for method in payment_methods %}
+                <option value="{{ method }}">{{ method }}</option>
+                {% endfor %}
+            </select><br>
+        {% elif column['name'] == "line_item" %}
+        <select name="{{ column['name'] }}" id="{{ column['name'] }}">
+            {% for item in line_items %}
+            <option value="{{ item }}">{{ item }}</option>
+            {% endfor %}
+        </select><br>
+        {% elif column['name'] == "budget_month" %}
+        <select name="{{ column['name'] }}" id="{{ column['name'] }}">
+            {% for month in months %}
+            <option value="{{ month }}">{{ month }}</option>
+            {% endfor %}
+        </select><br>
+        {% elif column['name'] == "budget_year" %}
+        <select name="{{ column['name'] }}" id="{{ column['name'] }}">
+            {% for year in years %}
+            <option value="{{ year }}">{{ year }}</option>
+            {% endfor %}
+        </select><br>
+        {% elif column['name'] == "amount" %}
+        <input type="number" id="{{ column['name'] }}" name="{{ column['name'] }}"
+            max="9999" min="0" step="0.01" required><br>
+        {% elif column['name'] == "date" %}
+        <input type="date" id="{{ column['name'] }}" name="{{ column['name'] }}" 
+            required value="{{ current_date }}"><br>
+        {% else %}  
+            <input type="text" id="{{ column['name'] }}" name="{{ column['name'] }}" required
+                maxlength="20"><br>
+        {% endif %}
+    {% endfor %}
+    <button type="submit">Submit</button><br>
+</form>
+
+{% endblock %}
+

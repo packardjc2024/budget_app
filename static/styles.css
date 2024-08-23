@@ -1,6 +1,5 @@
 .grey{
     background-color: lightgrey;
-    border-collapse: collapse;
 }
 
 td, th {
@@ -8,8 +7,10 @@ td, th {
 }
 
 table {
+    width: 100%;
     display: block;
     border: 2px solid black;
+    margin: 20px;
 }
 
 tr {
@@ -18,4 +19,12 @@ tr {
 
 .edit{
     border: 1px solid black;
+}
+
+.expenses_table th {
+    width: 10%;
+}
+
+.budget_table th{
+    width: 9%;
 }

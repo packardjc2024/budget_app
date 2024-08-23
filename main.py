@@ -3,16 +3,10 @@ from models import Budget, Expense, BudgetModel, ExpenseModel
 from datetime import datetime
 
 
-current_date = datetime.now()
-current_budget_month = current_date.strftime("%-m/%Y")
-months = [f"{i}/{current_date.year}" for i in range(1, 13)]
-budget_model = BudgetModel()
-expense_model = ExpenseModel()
-
-def context(budget_month):
-    current_budget = budget_model.select_budget(budget_month)
+def create_context(budget_month):
+    current_budget = BudgetModel().select_budget(budget_month)
     budget_summary = current_budget.calc_budget()
-    budget_summary["months"] = months
+    budget_summary["months"] = [f"{i}-{datetime.now().year}" for i in range(1, 13)]
     budget_summary["current"] = budget_month
     budget_summary["line_items"] = ExpenseModel().line_items
     budget_summary["payment_methods"] = ExpenseModel().payment_methods
@@ -21,20 +15,19 @@ def context(budget_month):
 
 app = Flask(__name__)
 
-@app.route("/", methods=["POST", "GET"])
-def home():
+
+@app.route("/", methods=["GET", "POST"])
+@app.route("/<budget_month>", methods=["GET", "POST"])
+def index(budget_month=datetime.now().strftime("%-m-%Y")):
     """
     This route serves as the home page for the app. When it first loads it uses
     datetime to get the current date and uses that month to serve as the default
     budget month. It then retrieves and displays the budget summary and the
     expenses for the budget.
-    """
-    if request.method == "GET":
-        return render_template("index.html", context=context(current_budget_month))
-    
-    elif request.method == "POST":
-        new_month = request.form.get("chosen_month")
-        return render_template("index.html", context=context(new_month))
+    """    
+    if request.method == "POST":
+        budget_month = request.form.get("chosen_month")
+    return render_template("index.html", context=create_context(budget_month))
     
 @app.route("/delete", methods=["POST"])
 def delete():
@@ -45,7 +38,7 @@ def delete():
     id = request.form.get("expense_id")
     expense = ExpenseModel().select_expense(id)
     ExpenseModel().delete(expense)
-    return render_template("index.html", context=context(expense.budget_month))
+    return redirect(url_for("index", budget_month=expense.budget_month))
 
 @app.route("/edit", methods=["POST"])
 def edit():
@@ -55,7 +48,7 @@ def edit():
     """
     id = request.form.get("expense_id")
     expense = ExpenseModel().select_expense(id)
-    dictionary = context(expense.budget_month)
+    dictionary = create_context(expense.budget_month)
     dictionary["expense"] = expense
     return render_template("edit.html", context=dictionary)
     
@@ -63,20 +56,27 @@ def edit():
 def update():
     """
     This route takes the changes to the expense entered into the form and 
-    updates the table before rerendering the home page. 
+    updates the table before redirecting to the home page. 
     """
     data = request.form
     expense = Expense(*data.values())
     ExpenseModel().update(expense)
-    return render_template("index.html", context=context(expense.budget_month))
+    return redirect(url_for("index", budget_month=expense.budget_month))
         
+@app.route("/add", methods=["GET", "POST"])
+def add():
+    if request.method == "GET":
+        budget_month = ""
+        return render_template("add.html", context=create_context(budget_month))
 
-#### Edit Expense
+    elif request.method == "POST":
+        budget_month = ""
+        return redirect(url_for("index", budget_month=expense.budget_month))
+
 #### Add Expense
 ##### make table bodys scrollable
 #### add option to check emails for expenses to add
-
-
+#### clearn up html and css
 
 if __name__ == "__main__":
     app.run()
