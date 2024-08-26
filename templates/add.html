@@ -20,7 +20,11 @@
         {% elif column == "budget_month" %}
         <select name="{{ column }}" id="{{ column }}">
             {% for month in context["months"] %}
+            {% if month == context["current"] %}
+            <option value="{{ month }}" selected>{{ month }}</option>
+            {% else %}
             <option value="{{ month }}">{{ month }}</option>
+            {% endif %}
             {% endfor %}
         </select><br>
         {% elif column == "amount" %}

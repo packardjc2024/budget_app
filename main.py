@@ -5,8 +5,13 @@ from datetime import datetime
 
 def create_context(budget_month):
     current_budget = BudgetModel().select_budget(budget_month)
-    budget_summary = current_budget.calc_budget()
-    budget_summary["months"] = [f"{i}-{datetime.now().year}" for i in range(1, 13)]
+    if current_budget:
+        budget_summary = current_budget.calc_budget()
+        budget_summary["is_budget"] = True
+    else:
+        budget_summary = {"is_budget": False}
+    # budget_summary["months"] = [f"{i}-{datetime.now().year}" for i in range(1, 13)]
+    budget_summary["months"] = BudgetModel().avaliable_budgets()
     budget_summary["current"] = budget_month
     budget_summary["line_items"] = ExpenseModel().line_items
     budget_summary["payment_methods"] = ExpenseModel().payment_methods
@@ -30,14 +35,14 @@ def home(budget_month):
     """
     return render_template("index.html", context=create_context(budget_month))
 
-@app.route("/month", methods=["GET", "POST"])
-def month():
+@app.route("/month/<budget_month>", methods=["GET"])
+@app.route("/month", methods=["POST"])
+def month(budget_month=None):
     """
-    This route allows the user to either change the month to a month in the table
-    or create a new budget.
+    This route allows the user to change the month to a different budget.
     """
     if request.method == "GET":
-        return render_template("month.html", context=create_context(datetime.now().strftime("%-m-%Y")))
+        return render_template("month.html", context=create_context(budget_month))
     elif request.method == "POST":
         return redirect(url_for("home", budget_month=request.form.get("chosen_month")))
 
@@ -89,21 +94,36 @@ def add(budget_month=None):
     elif request.method == "POST":
         data = request.form
         expense = Expense(*data.values())
-        print(expense.__dict__)
         ExpenseModel().add(expense)
         return redirect(url_for("home", budget_month=expense.budget_month))
 
-#### budget month in add defaults to 1/2024
+@app.route("/add_budget", methods=['GET', 'POST'])
+def add_budget():
+    """
+    This route allows the use to create a new budget.
+    """
+    if request.method == "GET":
+        context = create_context(datetime.now().strftime("%-m-%Y"))
+        context["budget_fields"] = BudgetModel().fields
+        context["months"] += [f"{i}-{datetime.now().year + 1}" for i in range(1, 13)]
+        context["months"] += [f"{i}-{datetime.now().year - 1}" for i in range(1, 13)]
+        return render_template("add_budget.html", context=context)
+    
+    elif request.method == "POST":
+        data = request.form
+        budget = Budget(*data.values())
+        BudgetModel().add(budget)
+        return redirect(url_for("home", budget_month=budget.budget_month))
+
+
+if __name__ == "__main__":
+    app.run()
 
 ##### make table bodys scrollable
 #### add option to check emails for expenses to add
 #### clearn up html and css
 #### make budgets editable with main.py and BudgetModel
 #### add ReadMe
-#### how to account if no budget?????>
 ### check submission validity before updating or adding ###
 ### testing
 ### logging
-
-if __name__ == "__main__":
-    app.run()

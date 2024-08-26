@@ -3,12 +3,14 @@
 <head>
     <title>Expenses</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
     <div class="nav_bar">
         <a href="{{ url_for('home', budget_month=context['current']) }}">Home</a>
-        <a href="{{ url_for('month') }}">Change Month</a>
+        <a href="{{ url_for('month', budget_month=context['current']) }}">Change Month</a>
         <a href="{{ url_for('add', budget_month=context['current']) }}">Add Expense</a>
+        <a href="{{ url_for('add_budget') }}">Add Budget</a>
     </div>
 
 
@@ -23,9 +25,13 @@
     {% block change_month %}
     {% endblock %}
 
+    {% block add_budget %}
+    {% endblock %}
+
     <br>
     <br>
 
+        {% if context["is_budget"] %}
     <table class="budget_table">
         <thead>
             <tr>
@@ -51,6 +57,9 @@
         {% endfor %}
         </tbody>
     </table>
+    {% else %}
+    <h3>No Budget created for {{ context['current'] }} yet...</h3>
+    {% endif %}
         
     <br>
     <br>

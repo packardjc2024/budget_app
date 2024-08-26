@@ -56,7 +56,10 @@ class Database:
         and then added to.
         """
         result = self.query(f"select * from {self.table} where {self.primary_key} like '{key_value}';")
-        return result[0]
+        if result:
+            return result[0]
+        else:
+            return None
     
     def add(self, object):
         """

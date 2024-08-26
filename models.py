@@ -142,7 +142,13 @@ class BudgetModel(Database):
         a Budget object.
         """
         results = self.select_row(key_value=budget_month)
-        return Budget(*results)
+        if results:
+            return Budget(*results)
+        else:
+            return None
+    
+    def avaliable_budgets(self):
+        return [result[0] for result in self.query(f"SELECT {self.primary_key} FROM {self.table}")]
     
 
 class ExpenseModel(Database):
