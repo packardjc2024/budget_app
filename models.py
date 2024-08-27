@@ -93,6 +93,7 @@ class Budget:
         Calls all of the 'private' methods in the proper order and then returns
         a dictionary that summarzes the current state of the budget. 
         """
+        budget_dict = self.__dict__
         budgeted = self.__calc_total()
         expenses = self.__get_expenses()
         spent = self.__calc_spent(expenses)
@@ -101,7 +102,8 @@ class Budget:
                 "budgeted": budgeted,
                 "expenses": expenses,
                 "spent": spent,
-                "remaining": remaining,}
+                "remaining": remaining,
+                "budget_dict": budget_dict}
 
 
 

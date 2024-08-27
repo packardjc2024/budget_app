@@ -10,7 +10,6 @@ def create_context(budget_month):
         budget_summary["is_budget"] = True
     else:
         budget_summary = {"is_budget": False}
-    # budget_summary["months"] = [f"{i}-{datetime.now().year}" for i in range(1, 13)]
     budget_summary["months"] = BudgetModel().avaliable_budgets()
     budget_summary["current"] = budget_month
     budget_summary["line_items"] = ExpenseModel().line_items
@@ -108,12 +107,29 @@ def add_budget():
         context["months"] += [f"{i}-{datetime.now().year + 1}" for i in range(1, 13)]
         context["months"] += [f"{i}-{datetime.now().year - 1}" for i in range(1, 13)]
         return render_template("add_budget.html", context=context)
-    
     elif request.method == "POST":
         data = request.form
         budget = Budget(*data.values())
         BudgetModel().add(budget)
         return redirect(url_for("home", budget_month=budget.budget_month))
+    
+@app.route("/edit_budget", methods=['POST'])
+@app.route("/edit/<budget_month>", methods=['GET'])
+def edit_budget(budget_month=None):
+    if request.method == 'GET':
+        context = create_context(budget_month)
+        return render_template("edit_budget.html", context=context)
+    elif request.method == 'POST':
+        budget = Budget(*request.form)
+        BudgetModel().update(budget)
+        return redirect(url_for("home", budget_month=budget.budget_month))
+    
+@app.route("/update_budget/<budget_month>", methods=['GET'])
+@app.route('/update_budget', methods=['POST'])
+def update_budget(budget_month=None):
+    if request.method == 'POST':
+        budget_month = request.form.get("chosen_month")
+    return redirect(url_for("edit_budget", budget_month=budget_month))
 
 
 if __name__ == "__main__":

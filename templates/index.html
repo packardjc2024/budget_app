@@ -11,6 +11,7 @@
         <a href="{{ url_for('month', budget_month=context['current']) }}">Change Month</a>
         <a href="{{ url_for('add', budget_month=context['current']) }}">Add Expense</a>
         <a href="{{ url_for('add_budget') }}">Add Budget</a>
+        <a href="{{ url_for('update_budget', budget_month=context['current'] ) }}">Edit Budget</a>
     </div>
 
 
@@ -26,6 +27,12 @@
     {% endblock %}
 
     {% block add_budget %}
+    {% endblock %}
+
+    {% block edit_budget %}
+    {% endblock %}
+
+    {% block update_budget %}
     {% endblock %}
 
     <br>

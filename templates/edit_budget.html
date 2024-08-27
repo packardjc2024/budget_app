@@ -1,0 +1,20 @@
+{% extends "index.html" %}
+{% block edit_budget %}
+
+<form action="/edit_budget" method="POST">
+    {% for key, value in context["budget_dict"].items() %}
+    <label for="{{ key }}">{{ key.replace("_", " ").title() }}</label>
+    {% if key == "budget_month" %}
+    <input type="text" value="{{ value }}" readonly>
+    <form action="/update_budget" method="POST">
+        <button type="submit">Change</button>
+    </form>
+    {% else %}
+    <input type="number" value="{{ value }}">
+    {% endif %}
+    <br>
+    {% endfor %}
+    <button type="submit">Update</button><br>
+</form>
+
+{% endblock %}
