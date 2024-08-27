@@ -120,17 +120,16 @@ def edit_budget(budget_month=None):
         context = create_context(budget_month)
         return render_template("edit_budget.html", context=context)
     elif request.method == 'POST':
-        budget = Budget(*request.form)
+        data = request.form.values()
+        budget = Budget(*data)
         BudgetModel().update(budget)
         return redirect(url_for("home", budget_month=budget.budget_month))
     
-@app.route("/update_budget/<budget_month>", methods=['GET'])
-@app.route('/update_budget', methods=['POST'])
-def update_budget(budget_month=None):
-    if request.method == 'POST':
-        budget_month = request.form.get("chosen_month")
-    return redirect(url_for("edit_budget", budget_month=budget_month))
-
+@app.route("/delete_budget/<budget_month>", methods=["GET"])
+def delete_budget(budget_month):
+    budget = BudgetModel().select_budget(budget_month)
+    BudgetModel().delete(budget)
+    return redirect(url_for("index"))
 
 if __name__ == "__main__":
     app.run()
@@ -138,7 +137,6 @@ if __name__ == "__main__":
 ##### make table bodys scrollable
 #### add option to check emails for expenses to add
 #### clearn up html and css
-#### make budgets editable with main.py and BudgetModel
 #### add ReadMe
 ### check submission validity before updating or adding ###
 ### testing

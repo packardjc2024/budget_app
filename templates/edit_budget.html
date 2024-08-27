@@ -5,12 +5,9 @@
     {% for key, value in context["budget_dict"].items() %}
     <label for="{{ key }}">{{ key.replace("_", " ").title() }}</label>
     {% if key == "budget_month" %}
-    <input type="text" value="{{ value }}" readonly>
-    <form action="/update_budget" method="POST">
-        <button type="submit">Change</button>
-    </form>
+    <input type="text" value="{{ value }}" name="{{ key }}" readonly>
     {% else %}
-    <input type="number" value="{{ value }}">
+    <input type="number" value="{{ value }}" name="{{ key }}">
     {% endif %}
     <br>
     {% endfor %}
